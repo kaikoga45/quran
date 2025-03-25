@@ -8,6 +8,7 @@ import UIKit
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
+    AudioPlayerHandler.register(with: self.registrar(forPlugin: "audio_player")!)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
