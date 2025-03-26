@@ -11,7 +11,7 @@ class AudioPlayerWidget extends StatefulWidget {
   final String subtitle;
   final (bool hasBackwardEnable, VoidCallback backwardCallback) backwardOptions;
   final (bool hasForwardEnable, VoidCallback forwardCallback) forwardOptions;
-  final VoidCallback onReady;
+  final VoidCallback onReadyCallback;
 
   const AudioPlayerWidget({
     super.key,
@@ -20,7 +20,7 @@ class AudioPlayerWidget extends StatefulWidget {
     required this.subtitle,
     required this.backwardOptions,
     required this.forwardOptions,
-    required this.onReady,
+    required this.onReadyCallback,
   });
 
   @override
@@ -33,8 +33,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   double totalDuration = 1;
   double currentPosition = 0;
   bool isPlaying = false;
-  bool isDragging = false;
+  bool isDraggingSlider = false;
   double dragPosition = 0;
+  bool isLooping = false;
 
   @override
   void initState() {
@@ -61,8 +62,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
       child: BlocConsumer<AudioPlayerBloc, AudioPlayerState>(
         listener: _listenerAudioPlayerBloc,
         builder: (context, state) {
-          if (state is AudioError) return Text(state.message);
-          if (state is AudioPlayerInitial) return const SizedBox.shrink();
+          if (state is AudioPlayerInitial || State is AudioError) {
+            return const SizedBox.shrink();
+          }
 
           return Container(
             decoration: BoxDecoration(
@@ -114,17 +116,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                                     : CupertinoIcons.play_arrow_solid,
                                 size: 40,
                               ),
-                              onPressed: () {
-                                if (isPlaying) {
-                                  context
-                                      .read<AudioPlayerBloc>()
-                                      .add(PauseAudio());
-                                } else {
-                                  context
-                                      .read<AudioPlayerBloc>()
-                                      .add(PlayAudio());
-                                }
-                              },
+                              onPressed: () => onPressedPlayButton(context),
                             ),
                             IconButton(
                               color: () {
@@ -146,19 +138,21 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                           activeColor: ColorConstant.valentineRed,
                           min: 0,
                           value: totalDuration > 0
-                              ? (isDragging ? dragPosition : currentPosition) /
+                              ? (isDraggingSlider
+                                      ? dragPosition
+                                      : currentPosition) /
                                   totalDuration
                               : 0.0,
                           onChanged: (value) {
                             setState(() {
-                              isDragging = true;
+                              isDraggingSlider = true;
                               dragPosition = value * totalDuration;
                               currentPosition = dragPosition;
                             });
                           },
                           onChangeEnd: (value) {
                             setState(() {
-                              isDragging = false;
+                              isDraggingSlider = false;
                             });
                             final int seekPosition = (value *
                                     Duration(seconds: totalDuration.toInt())
@@ -203,14 +197,19 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                               ),
                             ),
                             IconButton(
-                              color: Colors.white,
+                              color: () {
+                                if (isLooping) {
+                                  return Colors.white;
+                                }
+                                return ColorConstant.liver;
+                              }(),
                               icon: const Icon(
                                 CupertinoIcons.repeat,
                                 size: 30,
                               ),
-                              onPressed: () {
-                                // TODO: Iimplement Repeat
-                              },
+                              onPressed: () => setState(
+                                () => isLooping = !isLooping,
+                              ),
                             ),
                           ],
                         ),
@@ -233,6 +232,18 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     );
   }
 
+  void onPressedPlayButton(BuildContext context) {
+    final AudioPlayerBloc audioPlayerBloc = context.read<AudioPlayerBloc>();
+    if (isPlaying) {
+      audioPlayerBloc.add(PauseAudio());
+    } else {
+      if (_isAudioFinish()) {
+        audioPlayerBloc.add(SeekAudio(0));
+      }
+      audioPlayerBloc.add(PlayAudio());
+    }
+  }
+
   void _onPressedBackwardButton() {
     if (!widget.backwardOptions.$1) return;
     widget.backwardOptions.$2.call();
@@ -252,20 +263,38 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
 
   void _listenerAudioPlayerBloc(BuildContext context, AudioPlayerState state) {
     if (state is AudioReady) {
-      widget.onReady.call();
+      widget.onReadyCallback.call();
       context.read<AudioPlayerBloc>().add(GetDuration());
     }
     if (state is AudioDurationLoaded) {
       totalDuration = state.duration;
     }
-    if (state is AudioPositionUpdated && !isDragging) {
+    if (state is AudioPositionUpdated && !isDraggingSlider) {
       currentPosition = state.position.toDouble();
+      _listenerAudioFinish(context);
     }
     if (state is AudioPlaying) {
       isPlaying = true;
     }
-    if (state is AudioPaused) {
+    if (state is AudioPaused || state is AudioFinish) {
       isPlaying = false;
+    }
+  }
+
+  bool _isAudioFinish() {
+    return currentPosition.floor() == totalDuration.floor();
+  }
+
+  void _listenerAudioFinish(BuildContext context) {
+    final AudioPlayerBloc audioPlayerBloc = context.read<AudioPlayerBloc>();
+
+    if (!_isAudioFinish()) return;
+    if (isLooping) {
+      audioPlayerBloc
+        ..add(SeekAudio(0))
+        ..add(PlayAudio());
+    } else {
+      audioPlayerBloc.add(ResetAction());
     }
   }
 

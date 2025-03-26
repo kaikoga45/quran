@@ -165,13 +165,9 @@ void main() {
   });
 
   test('GetDuration_CalledSuccesfuly_ReturnsTotalDuration', () async {
-    const String audioUrl = 'https://santrikoding.com/storage/audio/001.mp3';
-
-    const Map<String, dynamic> payload = {'url': audioUrl};
     when(
       methodChannel.invokeMethod(
         AudioPlayerServicesAction.getDuration.name,
-        payload,
       ),
     ).thenAnswer((_) async => null);
 
@@ -180,28 +176,18 @@ void main() {
     verify(
       methodChannel.invokeMethod(
         AudioPlayerServicesAction.getDuration.name,
-        payload,
       ),
     ).called(1);
   });
 
   test('GetDuration_InvalidPosition_ThrowsPlatformException', () async {
-    const String invalidAudioUrl = 'https://santrikoding.com';
-
-    const Map<String, dynamic> payload = {'url': invalidAudioUrl};
-
-    const String invalidUrlErrorCode = 'INVALID_URL';
-    const String invalidUrlErrorMessage = 'Invalid audio URL';
-
     when(
       methodChannel.invokeMethod(
         AudioPlayerServicesAction.getDuration.name,
-        payload,
       ),
     ).thenThrow(
       PlatformException(
-        code: invalidUrlErrorCode,
-        message: invalidUrlErrorMessage,
+        code: undefinedErrorCode,
       ),
     );
 
@@ -209,9 +195,7 @@ void main() {
       () => audioPlayerService.getDuration(),
       throwsA(
         predicate((e) {
-          return e is PlatformException &&
-              e.code == invalidUrlErrorCode &&
-              e.message == invalidUrlErrorMessage;
+          return e is PlatformException && e.code == undefinedErrorCode;
         }),
       ),
     );
