@@ -97,12 +97,15 @@ class _LoadedHomePageState extends State<LoadedHomePage> {
 
   void _onSubmittedSearchSurah(String value) {
     setState(() {
-      if (value.isEmpty) searchSurah = widget.listSurah;
-      searchSurah = widget.listSurah
-          .where(
-            (e) => e.latinName.toLowerCase().contains(value.toLowerCase()),
-          )
-          .toList();
+      if (value.isEmpty) {
+        searchSurah = widget.listSurah;
+      } else {
+        searchSurah = widget.listSurah
+            .where(
+              (e) => e.latinName.toLowerCase().contains(value.toLowerCase()),
+            )
+            .toList();
+      }
     });
   }
 }
