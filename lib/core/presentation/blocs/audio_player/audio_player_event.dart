@@ -26,3 +26,5 @@ class GetDuration extends AudioPlayerEvent {
 }
 
 class GetCurrentPosition extends AudioPlayerEvent {}
+
+class DisposeAudio extends AudioPlayerEvent {}
