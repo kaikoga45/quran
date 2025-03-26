@@ -1,0 +1,18 @@
+{
+    "version": "0.2./0",
+    "configurations": [
+        {
+            "name": "Production",
+            "request": "launch",
+            "type": "dart",
+        },
+        {
+            "name": "Profile",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--profile"
+            ],
+        },
+    ]
+}
