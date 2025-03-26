@@ -5,18 +5,18 @@ sealed class AudioPlayerEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class SetupAudio extends AudioPlayerEvent {
+final class SetupAudio extends AudioPlayerEvent {
   final String url;
   SetupAudio(this.url);
   @override
   List<Object?> get props => [url];
 }
 
-class PlayAudio extends AudioPlayerEvent {}
+final class PlayAudio extends AudioPlayerEvent {}
 
-class PauseAudio extends AudioPlayerEvent {}
+final class PauseAudio extends AudioPlayerEvent {}
 
-class SeekAudio extends AudioPlayerEvent {
+final class SeekAudio extends AudioPlayerEvent {
   final int position;
   SeekAudio(this.position);
 
@@ -24,10 +24,10 @@ class SeekAudio extends AudioPlayerEvent {
   List<Object?> get props => [position];
 }
 
-class ResetAction extends AudioPlayerEvent {}
+final class ResetAction extends AudioPlayerEvent {}
 
-class GetDuration extends AudioPlayerEvent {}
+final class GetDuration extends AudioPlayerEvent {}
 
-class GetCurrentPosition extends AudioPlayerEvent {}
+final class GetCurrentPosition extends AudioPlayerEvent {}
 
-class DisposeAudio extends AudioPlayerEvent {}
+final class DisposeAudio extends AudioPlayerEvent {}

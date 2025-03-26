@@ -5,15 +5,15 @@ sealed class AudioPlayerState extends Equatable {
   List<Object?> get props => [];
 }
 
-class AudioPlayerInitial extends AudioPlayerState {}
+final class AudioPlayerInitial extends AudioPlayerState {}
 
-class AudioReady extends AudioPlayerState {}
+final class AudioReady extends AudioPlayerState {}
 
-class AudioPlaying extends AudioPlayerState {}
+final class AudioPlaying extends AudioPlayerState {}
 
-class AudioPaused extends AudioPlayerState {}
+final class AudioPaused extends AudioPlayerState {}
 
-class AudioDurationLoaded extends AudioPlayerState {
+final class AudioDurationLoaded extends AudioPlayerState {
   final double duration;
   AudioDurationLoaded(this.duration);
 
@@ -21,7 +21,7 @@ class AudioDurationLoaded extends AudioPlayerState {
   List<Object?> get props => [duration];
 }
 
-class AudioPositionUpdated extends AudioPlayerState {
+final class AudioPositionUpdated extends AudioPlayerState {
   final int position;
   AudioPositionUpdated(this.position);
 
@@ -29,9 +29,9 @@ class AudioPositionUpdated extends AudioPlayerState {
   List<Object?> get props => [position];
 }
 
-class AudioFinish extends AudioPlayerState {}
+final class AudioFinish extends AudioPlayerState {}
 
-class AudioError extends AudioPlayerState {
+final class AudioError extends AudioPlayerState {
   final String message;
   AudioError(this.message);
 
