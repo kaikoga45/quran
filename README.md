@@ -38,7 +38,7 @@ The Quran App is built with a focus on maintainability, performance, and a modul
 
 ### 2. Architecture & Dependency Injection  
 - **Clean Architecture:** Follows a structured architecture divided into Presentation, Domain, and Data layers.  
-- **Dependency Injection:** Utilizes the `Get_IT` package to manage dependencies effectively, ensuring a decoupled and testable codebase.  
+- **Dependency Injection:** Utilizes the `Get_it` package to manage dependencies effectively, ensuring a decoupled and testable codebase.  
 
 ### 3. Audio Player Implementation  
 - **Custom Native Code:** Instead of relying on third-party packages, the audio player is implemented using custom native code.  
@@ -50,7 +50,8 @@ The Quran App is built with a focus on maintainability, performance, and a modul
 - Implements the BLOC (Business Logic Component) pattern to manage state, promoting a clear separation between business logic and UI.  
 
 ### 5. Testing  
-- Implements selected **unit and widget tests** as a demonstration of structured testing practices, showcasing an understanding of test implementation in Flutter.  
+- Implements selected **unit and widget tests** using the AAA pattern for structured testing practices, showcasing an understanding of test implementation in Flutter. 
+- The naming convention for tests follows the Microsoft approach, consisting of three parts: the name of the method being tested, the scenario under which the method is being tested, and the expected behavior when the scenario is invoked.
 
 ### 6. Code Quality & Design Principles  
 - Adheres to the Separation of Concerns (SoC) and DRY (Don't Repeat Yourself) principles, ensuring the code is maintainable, scalable, and easy to understand.  
