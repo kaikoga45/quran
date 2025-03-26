@@ -1,16 +1,16 @@
 import 'package:equatable/equatable.dart';
 
 class SurahEntities extends Equatable {
-  int number;
-  String name;
-  String latinName;
-  int numberOfVerses;
-  String placeOfRevelation;
-  String meaning;
-  String description;
-  String audio;
+  final int number;
+  final String name;
+  final String latinName;
+  final int numberOfVerses;
+  final String placeOfRevelation;
+  final String meaning;
+  final String description;
+  final String audio;
 
-  SurahEntities({
+  const SurahEntities({
     required this.number,
     required this.name,
     required this.latinName,
