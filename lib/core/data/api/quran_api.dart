@@ -11,11 +11,11 @@ class QuranApi {
 
   QuranApi(Dio dio) : _dio = dio;
 
-  static const String _baseUrl = 'https://open-api.my.id/api/quran';
+  static const String baseUrl = 'https://open-api.my.id/api/quran';
 
   Future<List<SurahEntities>> getListSurah() async {
     final Response<dynamic> surahResponse =
-        await _dio.get('$_baseUrl/${QuranApiEndpoint.surah.name}');
+        await _dio.get('$baseUrl/${QuranApiEndpoint.surah.name}');
 
     return List<SurahEntities>.from(
       surahResponse.data.map(
@@ -26,7 +26,7 @@ class QuranApi {
 
   Future<DetailSurahEntities> getDetailSurah(int surahNumber) async {
     final Response<dynamic> detailSurahResponse =
-        await _dio.get('$_baseUrl/${QuranApiEndpoint.surah.name}/$surahNumber');
+        await _dio.get('$baseUrl/${QuranApiEndpoint.surah.name}/$surahNumber');
     return DetailSurahEntities.fromJson(detailSurahResponse.data);
   }
 }
