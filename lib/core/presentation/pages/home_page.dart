@@ -69,7 +69,7 @@ class _LoadedHomePageState extends State<LoadedHomePage> {
             children: [
               CupertinoSearchTextField(
                 placeholder: 'Surah',
-                onSubmitted: _onSubmittedSearchSurah,
+                onChanged: _onChangedSearchSurah,
               ),
               const SizedBox(
                 height: 10,
@@ -95,7 +95,7 @@ class _LoadedHomePageState extends State<LoadedHomePage> {
     );
   }
 
-  void _onSubmittedSearchSurah(String value) {
+  void _onChangedSearchSurah(String value) {
     setState(() {
       if (value.isEmpty) {
         searchSurah = widget.listSurah;

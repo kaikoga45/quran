@@ -29,6 +29,8 @@ class AudioPositionUpdated extends AudioPlayerState {
   List<Object?> get props => [position];
 }
 
+class AudioFinish extends AudioPlayerState {}
+
 class AudioError extends AudioPlayerState {
   final String message;
   AudioError(this.message);

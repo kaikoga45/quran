@@ -153,7 +153,7 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
                     widget.detailSurah.nextSurah.status,
                     () => widget.forwardCallback.call(),
                   ),
-                  onReady: _setHeightAudioPlayer,
+                  onReadyCallback: _setHeightAudioPlayer,
                 ),
               );
             },

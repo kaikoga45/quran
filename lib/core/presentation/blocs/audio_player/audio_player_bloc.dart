@@ -15,6 +15,9 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
   AudioPlayerBloc(AudioPlayerRepositories repositories)
       : _repositories = repositories,
         super(AudioPlayerInitial()) {
+    on<ResetAction>((event, emit) {
+      emit(AudioFinish());
+    });
     on<SetupAudio>((event, emit) async {
       try {
         await _repositories.setup(event.url);
@@ -63,7 +66,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
 
     on<GetCurrentPosition>((event, emit) async {
       try {
-        final position = await _repositories.getCurrentPosition();
+        final double position = await _repositories.getCurrentPosition();
         emit(AudioPositionUpdated(position.toInt()));
       } on PlatformException catch (e) {
         emit(AudioError(e.message ?? "Error getting position"));

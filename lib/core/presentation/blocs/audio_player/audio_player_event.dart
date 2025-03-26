@@ -24,6 +24,8 @@ class SeekAudio extends AudioPlayerEvent {
   List<Object?> get props => [position];
 }
 
+class ResetAction extends AudioPlayerEvent {}
+
 class GetDuration extends AudioPlayerEvent {}
 
 class GetCurrentPosition extends AudioPlayerEvent {}
