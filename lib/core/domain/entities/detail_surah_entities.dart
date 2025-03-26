@@ -11,8 +11,8 @@ class DetailSurahEntities extends Equatable {
   final String description;
   final String audio;
   final List<Verse> verses;
-  final ({NextSurah? nextSurah, bool? status}) nextSurah;
-  final ({NextSurah? previousSurah, bool? status}) previousSurah;
+  final ({NextSurah? nextSurah, bool status}) nextSurah;
+  final ({NextSurah? previousSurah, bool status}) previousSurah;
 
   const DetailSurahEntities({
     required this.status,
