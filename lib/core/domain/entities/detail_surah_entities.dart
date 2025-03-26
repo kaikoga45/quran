@@ -1,18 +1,20 @@
-class DetailSurahEntities {
-  bool status;
-  int number;
-  String name;
-  String latinName;
-  int totalVerses;
-  String revelationPlace;
-  String meaning;
-  String description;
-  String audio;
-  List<Verse> verses;
-  ({NextSurah? nextSurah, bool? status}) nextSurah;
-  ({NextSurah? previousSurah, bool? status}) previousSurah;
+import 'package:equatable/equatable.dart';
 
-  DetailSurahEntities({
+class DetailSurahEntities extends Equatable {
+  final bool status;
+  final int number;
+  final String name;
+  final String latinName;
+  final int totalVerses;
+  final String revelationPlace;
+  final String meaning;
+  final String description;
+  final String audio;
+  final List<Verse> verses;
+  final ({NextSurah? nextSurah, bool? status}) nextSurah;
+  final ({NextSurah? previousSurah, bool? status}) previousSurah;
+
+  const DetailSurahEntities({
     required this.status,
     required this.number,
     required this.name,
@@ -55,17 +57,33 @@ class DetailSurahEntities {
             ),
     );
   }
+
+  @override
+  List<Object?> get props => [
+        status,
+        number,
+        name,
+        latinName,
+        totalVerses,
+        revelationPlace,
+        meaning,
+        description,
+        audio,
+        verses,
+        nextSurah,
+        previousSurah,
+      ];
 }
 
-class Verse {
-  int id;
-  int surah;
-  int number;
-  String arabic;
-  String transliteration;
-  String translation;
+class Verse extends Equatable {
+  final int id;
+  final int surah;
+  final int number;
+  final String arabic;
+  final String transliteration;
+  final String translation;
 
-  Verse({
+  const Verse({
     required this.id,
     required this.surah,
     required this.number,
@@ -84,20 +102,30 @@ class Verse {
       translation: json['idn'],
     );
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        surah,
+        number,
+        arabic,
+        transliteration,
+        translation,
+      ];
 }
 
-class NextSurah {
-  int id;
-  int number;
-  String name;
-  String latinName;
-  int totalVerses;
-  String revelationPlace;
-  String meaning;
-  String description;
-  String audio;
+class NextSurah extends Equatable {
+  final int id;
+  final int number;
+  final String name;
+  final String latinName;
+  final int totalVerses;
+  final String revelationPlace;
+  final String meaning;
+  final String description;
+  final String audio;
 
-  NextSurah({
+  const NextSurah({
     required this.id,
     required this.number,
     required this.name,
@@ -122,4 +150,17 @@ class NextSurah {
       audio: json['audio'],
     );
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        number,
+        name,
+        latinName,
+        totalVerses,
+        revelationPlace,
+        meaning,
+        description,
+        audio,
+      ];
 }
