@@ -24,12 +24,10 @@ class _HomePageState extends State<HomePage> {
         return SurahBloc(surahRepositories)..add(GetSurah());
       },
       child: BlocBuilder<SurahBloc, SurahState>(
-        builder: (context, state) {
-          return switch (state) {
-            SurahLoading _ => const LoadingWidget(),
-            SurahLoaded surahLoaded => LoadedHomePage(surahLoaded.listSurah),
-            _ => const SizedBox(),
-          };
+        builder: (context, state) => switch (state) {
+          SurahLoading _ => const LoadingWidget(),
+          SurahLoaded surahLoaded => LoadedHomePage(surahLoaded.listSurah),
+          _ => const SizedBox(),
         },
       ),
     );
@@ -71,18 +69,7 @@ class _LoadedHomePageState extends State<LoadedHomePage> {
             children: [
               CupertinoSearchTextField(
                 placeholder: 'Surah',
-                onSubmitted: (value) {
-                  setState(() {
-                    if (value.isEmpty) searchSurah = widget.listSurah;
-                    searchSurah = widget.listSurah
-                        .where(
-                          (e) => e.latinName
-                              .toLowerCase()
-                              .contains(value.toLowerCase()),
-                        )
-                        .toList();
-                  });
-                },
+                onSubmitted: _onSubmittedSearchSurah,
               ),
               const SizedBox(
                 height: 10,
@@ -90,13 +77,7 @@ class _LoadedHomePageState extends State<LoadedHomePage> {
               Expanded(
                 child: ListSurahWidget(
                   listSurah: searchSurah,
-                  onTap: (surahNumber) {
-                    Navigator.pushNamed(
-                      context,
-                      RouteConstant.detailSurah,
-                      arguments: surahNumber,
-                    );
-                  },
+                  onTap: _onTapSurahItem,
                 ),
               ),
             ],
@@ -104,5 +85,24 @@ class _LoadedHomePageState extends State<LoadedHomePage> {
         ),
       ),
     );
+  }
+
+  void _onTapSurahItem(int surahNumber) {
+    Navigator.pushNamed(
+      context,
+      RouteConstant.detailSurah,
+      arguments: surahNumber,
+    );
+  }
+
+  void _onSubmittedSearchSurah(String value) {
+    setState(() {
+      if (value.isEmpty) searchSurah = widget.listSurah;
+      searchSurah = widget.listSurah
+          .where(
+            (e) => e.latinName.toLowerCase().contains(value.toLowerCase()),
+          )
+          .toList();
+    });
   }
 }
