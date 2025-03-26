@@ -262,9 +262,11 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   }
 
   void _listenerAudioPlayerBloc(BuildContext context, AudioPlayerState state) {
+    final AudioPlayerBloc audioPlayerBloc = context.read<AudioPlayerBloc>();
+
     if (state is AudioReady) {
       widget.onReadyCallback.call();
-      context.read<AudioPlayerBloc>().add(GetDuration());
+      audioPlayerBloc.add(GetDuration());
     }
     if (state is AudioDurationLoaded) {
       totalDuration = state.duration;
@@ -278,6 +280,9 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     }
     if (state is AudioPaused || state is AudioFinish) {
       isPlaying = false;
+    }
+    if (state is AudioError) {
+      audioPlayerBloc.add(DisposeAudio());
     }
   }
 
