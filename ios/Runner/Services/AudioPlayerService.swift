@@ -20,6 +20,17 @@ class AudioPlayerHandler: NSObject, FlutterPlugin {
 
     func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
+        case "setup":
+            guard let args = call.arguments as? [String: Any],
+                  let urlString = args["url"] as? String,
+                  let url = URL(string: urlString) else {
+                result(FlutterError(code: "INVALID_URL", message: "Invalid audio URL", details: nil))
+                return
+            }
+            playerItem = AVPlayerItem(url: url)
+            audioPlayer = AVPlayer(playerItem: playerItem)
+            result(nil)
+
         case "play":
             audioPlayer?.play()
             result(nil)
@@ -42,14 +53,6 @@ class AudioPlayerHandler: NSObject, FlutterPlugin {
             result(nil)
 
         case "getDuration":
-            guard let args = call.arguments as? [String: Any],
-                  let urlString = args["url"] as? String,
-                  let url = URL(string: urlString) else {
-                result(FlutterError(code: "INVALID_URL", message: "Invalid audio URL", details: nil))
-                return
-            }
-            playerItem = AVPlayerItem(url: url)
-            audioPlayer = AVPlayer(playerItem: playerItem)
             result(playerItem?.asset.duration.seconds ?? 0)
 
         case "getCurrentPosition":
