@@ -2,20 +2,23 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
+import 'package:quran/core/domain/repositories/audio_player_repositories.dart';
 
 part 'audio_player_event.dart';
 part 'audio_player_state.dart';
 
 class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
-  static const MethodChannel _channel = MethodChannel('audio_player');
   Timer? _positionTimer; // Timer to update playback position
 
-  AudioPlayerBloc() : super(AudioPlayerInitial()) {
+  final AudioPlayerRepositories _repositories;
+
+  AudioPlayerBloc(AudioPlayerRepositories repositories)
+      : _repositories = repositories,
+        super(AudioPlayerInitial()) {
     on<PlayAudio>((event, emit) async {
       try {
-        await _channel.invokeMethod('play');
+        await _repositories.play();
         emit(AudioPlaying());
-
         // Start updating playback position
         _startPositionUpdates();
       } on PlatformException catch (e) {
@@ -25,7 +28,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
 
     on<PauseAudio>((event, emit) async {
       try {
-        await _channel.invokeMethod('pause');
+        await _repositories.pause();
         emit(AudioPaused());
         _positionTimer?.cancel(); // Stop updating position
       } on PlatformException catch (e) {
@@ -35,7 +38,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
 
     on<SeekAudio>((event, emit) async {
       try {
-        await _channel.invokeMethod('seekTo', {'position': event.position});
+        await _repositories.seek(event.position);
       } on PlatformException catch (e) {
         emit(AudioError(e.message ?? "Error seeking audio"));
       }
@@ -43,9 +46,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
 
     on<GetDuration>((event, emit) async {
       try {
-        final duration = await _channel
-                .invokeMethod<double>('getDuration', {'url': event.url}) ??
-            0;
+        final duration = await _repositories.getDuration(event.url);
         emit(AudioDurationLoaded(duration));
       } on PlatformException catch (e) {
         emit(AudioError(e.message ?? "Error getting duration"));
@@ -54,13 +55,16 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
 
     on<GetCurrentPosition>((event, emit) async {
       try {
-        final position =
-            await _channel.invokeMethod<double>('getCurrentPosition') ?? 0;
+        final position = await _repositories.getCurrentPosition();
         emit(AudioPositionUpdated(position.toInt()));
       } on PlatformException catch (e) {
         emit(AudioError(e.message ?? "Error getting position"));
       }
     });
+
+    on<DisposeAudio>(
+      (_, __) => _resetAudioPlayer(),
+    );
   }
 
   void _startPositionUpdates() {
@@ -70,10 +74,14 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
     });
   }
 
+  void _resetAudioPlayer() {
+    _positionTimer?.cancel(); // Clean up timer
+    _repositories.stop(); // Stop the audio
+  }
+
   @override
   Future<void> close() {
-    _positionTimer?.cancel(); // Clean up timer
-    _channel.invokeMethod('stop'); // Stop the audio
+    _resetAudioPlayer();
     return super.close();
   }
 }
