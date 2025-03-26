@@ -28,23 +28,23 @@ class DetailSurahPage extends StatelessWidget {
       child: BlocBuilder<DetailSurahBloc, DetailSurahState>(
         builder: (context, state) => switch (state) {
           DetailSurahLoading _ => const LoadingWidget(),
-          DetailSurahLoaded detailSurahLoaded => LoadedDetailSurahPage(
-              detailSurahLoaded.detailSurah,
-              backwardCallback: () {
-                final int newSurahNumber = detailSurahLoaded
-                    .detailSurah.previousSurah.previousSurah!.number;
-                context
-                    .read<DetailSurahBloc>()
-                    .add(ChangeDetailSurah(newSurahNumber));
-              },
-              forwardCallback: () {
-                final int newSurahNumber =
-                    detailSurahLoaded.detailSurah.nextSurah.nextSurah!.number;
-                context
-                    .read<DetailSurahBloc>()
-                    .add(ChangeDetailSurah(newSurahNumber));
-              },
-            ),
+          DetailSurahLoaded detailSurahLoaded => () {
+              final DetailSurahBloc detailSurahBloc =
+                  context.read<DetailSurahBloc>();
+              return LoadedDetailSurahPage(
+                detailSurahLoaded.detailSurah,
+                backwardCallback: () {
+                  final int newSurahNumber = detailSurahLoaded
+                      .detailSurah.previousSurah.previousSurah!.number;
+                  detailSurahBloc.add(ChangeDetailSurah(newSurahNumber));
+                },
+                forwardCallback: () {
+                  final int newSurahNumber =
+                      detailSurahLoaded.detailSurah.nextSurah.nextSurah!.number;
+                  detailSurahBloc.add(ChangeDetailSurah(newSurahNumber));
+                },
+              );
+            }(),
           _ => const SizedBox(),
         },
       ),
