@@ -28,23 +28,8 @@ class DetailSurahPage extends StatelessWidget {
       child: BlocBuilder<DetailSurahBloc, DetailSurahState>(
         builder: (context, state) => switch (state) {
           DetailSurahLoading _ => const LoadingWidget(),
-          DetailSurahLoaded detailSurahLoaded => () {
-              final DetailSurahBloc detailSurahBloc =
-                  context.read<DetailSurahBloc>();
-              return LoadedDetailSurahPage(
-                detailSurahLoaded.detailSurah,
-                backwardCallback: () {
-                  final int newSurahNumber = detailSurahLoaded
-                      .detailSurah.previousSurah.previousSurah!.number;
-                  detailSurahBloc.add(ChangeDetailSurah(newSurahNumber));
-                },
-                forwardCallback: () {
-                  final int newSurahNumber =
-                      detailSurahLoaded.detailSurah.nextSurah.nextSurah!.number;
-                  detailSurahBloc.add(ChangeDetailSurah(newSurahNumber));
-                },
-              );
-            }(),
+          DetailSurahLoaded detailSurahLoaded =>
+            LoadedDetailSurahPage(detailSurahLoaded.detailSurah),
           _ => const SizedBox(),
         },
       ),
@@ -54,13 +39,9 @@ class DetailSurahPage extends StatelessWidget {
 
 class LoadedDetailSurahPage extends StatefulWidget {
   final DetailSurahEntities detailSurah;
-  final VoidCallback backwardCallback;
-  final VoidCallback forwardCallback;
 
   const LoadedDetailSurahPage(
     this.detailSurah, {
-    required this.backwardCallback,
-    required this.forwardCallback,
     super.key,
   });
 
@@ -135,6 +116,8 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
           AnimatedBuilder(
             animation: _animationController,
             builder: (_, __) {
+              final DetailSurahBloc detailSurahBloc =
+                  context.read<DetailSurahBloc>();
               return Transform.translate(
                 offset: Offset(
                   0,
@@ -147,11 +130,11 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
                   subtitle: widget.detailSurah.revelationPlace,
                   backwardOptions: (
                     widget.detailSurah.previousSurah.status,
-                    () => widget.backwardCallback.call(),
+                    () => _backwardCallback(detailSurahBloc),
                   ),
                   forwardOptions: (
                     widget.detailSurah.nextSurah.status,
-                    () => widget.forwardCallback.call(),
+                    () => _forwardCallback(detailSurahBloc),
                   ),
                   onReadyCallback: _setHeightAudioPlayer,
                 ),
@@ -161,6 +144,17 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
         ],
       ),
     );
+  }
+
+  void _backwardCallback(DetailSurahBloc detailSurahBloc) {
+    final int newSurahNumber =
+        widget.detailSurah.previousSurah.previousSurah!.number;
+    detailSurahBloc.add(ChangeDetailSurah(newSurahNumber));
+  }
+
+  void _forwardCallback(DetailSurahBloc detailSurahBloc) {
+    final int newSurahNumber = widget.detailSurah.nextSurah.nextSurah!.number;
+    detailSurahBloc.add(ChangeDetailSurah(newSurahNumber));
   }
 
   void _onScrollListVerse() {
