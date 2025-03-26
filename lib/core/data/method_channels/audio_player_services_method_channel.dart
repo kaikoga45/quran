@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 
 enum AudioPlayerServicesAction {
+  setup,
   play,
   pause,
   seekTo,
@@ -13,6 +14,13 @@ class AudioPlayerServicesMethodChannel {
   final MethodChannel _channel;
 
   AudioPlayerServicesMethodChannel(MethodChannel channel) : _channel = channel;
+
+  Future<void> setup(String url) {
+    return _channel.invokeMethod(
+      AudioPlayerServicesAction.setup.name,
+      {'url': url},
+    );
+  }
 
   Future<void> play() {
     return _channel.invokeMethod(AudioPlayerServicesAction.play.name);
@@ -32,11 +40,9 @@ class AudioPlayerServicesMethodChannel {
     return _channel.invokeMethod(AudioPlayerServicesAction.stop.name);
   }
 
-  Future<double> getDuration(String audioUrl) async {
+  Future<double> getDuration() async {
     return await _channel
-            .invokeMethod<double>(AudioPlayerServicesAction.getDuration.name, {
-          'url': audioUrl,
-        }) ??
+            .invokeMethod<double>(AudioPlayerServicesAction.getDuration.name) ??
         0.0;
   }
 

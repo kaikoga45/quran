@@ -7,6 +7,8 @@ sealed class AudioPlayerState extends Equatable {
 
 class AudioPlayerInitial extends AudioPlayerState {}
 
+class AudioReady extends AudioPlayerState {}
+
 class AudioPlaying extends AudioPlayerState {}
 
 class AudioPaused extends AudioPlayerState {}

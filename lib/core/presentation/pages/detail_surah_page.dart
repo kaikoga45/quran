@@ -81,7 +81,6 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
   void initState() {
     super.initState();
     _audioPlayerKeyWidget = GlobalKey();
-    _setHeightAudioPlayer();
     _scrollController = ScrollController();
     _animationController = AnimationController(
       vsync: this,
@@ -154,6 +153,7 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
                     widget.detailSurah.nextSurah.status,
                     () => widget.forwardCallback.call(),
                   ),
+                  onReady: _setHeightAudioPlayer,
                 ),
               );
             },

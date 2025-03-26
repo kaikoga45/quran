@@ -6,6 +6,10 @@ class AudioPlayerRepositories {
   const AudioPlayerRepositories(AudioPlayerServicesMethodChannel channel)
       : _channel = channel;
 
+  Future<void> setup(String url) {
+    return _channel.setup(url);
+  }
+
   Future<void> play() {
     return _channel.play();
   }
@@ -22,8 +26,8 @@ class AudioPlayerRepositories {
     return _channel.stop();
   }
 
-  Future<double> getDuration(String audioUrl) {
-    return _channel.getDuration(audioUrl);
+  Future<double> getDuration() {
+    return _channel.getDuration();
   }
 
   Future<double> getCurrentPosition() {

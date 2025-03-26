@@ -175,7 +175,7 @@ void main() {
       ),
     ).thenAnswer((_) async => null);
 
-    await audioPlayerService.getDuration(audioUrl);
+    await audioPlayerService.getDuration();
 
     verify(
       methodChannel.invokeMethod(
@@ -206,7 +206,7 @@ void main() {
     );
 
     expect(
-      () => audioPlayerService.getDuration(invalidAudioUrl),
+      () => audioPlayerService.getDuration(),
       throwsA(
         predicate((e) {
           return e is PlatformException &&

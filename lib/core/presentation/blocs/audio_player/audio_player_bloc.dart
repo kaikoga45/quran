@@ -15,6 +15,14 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
   AudioPlayerBloc(AudioPlayerRepositories repositories)
       : _repositories = repositories,
         super(AudioPlayerInitial()) {
+    on<SetupAudio>((event, emit) async {
+      try {
+        await _repositories.setup(event.url);
+        emit(AudioReady());
+      } on PlatformException catch (e) {
+        emit(AudioError(e.message ?? "Error setup audio"));
+      }
+    });
     on<PlayAudio>((event, emit) async {
       try {
         await _repositories.play();
@@ -46,7 +54,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
 
     on<GetDuration>((event, emit) async {
       try {
-        final duration = await _repositories.getDuration(event.url);
+        final duration = await _repositories.getDuration();
         emit(AudioDurationLoaded(duration));
       } on PlatformException catch (e) {
         emit(AudioError(e.message ?? "Error getting duration"));

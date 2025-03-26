@@ -11,6 +11,7 @@ class AudioPlayerWidget extends StatefulWidget {
   final String subtitle;
   final (bool hasBackwardEnable, VoidCallback backwardCallback) backwardOptions;
   final (bool hasForwardEnable, VoidCallback forwardCallback) forwardOptions;
+  final VoidCallback onReady;
 
   const AudioPlayerWidget({
     super.key,
@@ -19,6 +20,7 @@ class AudioPlayerWidget extends StatefulWidget {
     required this.subtitle,
     required this.backwardOptions,
     required this.forwardOptions,
+    required this.onReady,
   });
 
   @override
@@ -60,6 +62,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         listener: _listenerAudioPlayerBloc,
         builder: (context, state) {
           if (state is AudioError) return Text(state.message);
+          if (state is AudioPlayerInitial) return const SizedBox.shrink();
 
           return Container(
             decoration: BoxDecoration(
@@ -244,10 +247,14 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     final audioPlayerRepositories =
         RepositoryProvider.of<AudioPlayerRepositories>(context);
     _audioPlayerBloc = AudioPlayerBloc(audioPlayerRepositories)
-      ..add(GetDuration(widget.audioUrl));
+      ..add(SetupAudio(widget.audioUrl));
   }
 
   void _listenerAudioPlayerBloc(BuildContext context, AudioPlayerState state) {
+    if (state is AudioReady) {
+      widget.onReady.call();
+      context.read<AudioPlayerBloc>().add(GetDuration());
+    }
     if (state is AudioDurationLoaded) {
       totalDuration = state.duration;
     }
@@ -266,7 +273,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
     isPlaying = false;
     _audioPlayerBloc
       ..add(DisposeAudio())
-      ..add(GetDuration(widget.audioUrl));
+      ..add(SetupAudio(widget.audioUrl));
   }
 
   String _formatDuration(double duration) {

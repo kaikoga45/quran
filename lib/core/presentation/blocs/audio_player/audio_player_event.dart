@@ -5,6 +5,13 @@ sealed class AudioPlayerEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class SetupAudio extends AudioPlayerEvent {
+  final String url;
+  SetupAudio(this.url);
+  @override
+  List<Object?> get props => [url];
+}
+
 class PlayAudio extends AudioPlayerEvent {}
 
 class PauseAudio extends AudioPlayerEvent {}
@@ -17,13 +24,7 @@ class SeekAudio extends AudioPlayerEvent {
   List<Object?> get props => [position];
 }
 
-class GetDuration extends AudioPlayerEvent {
-  final String url;
-  GetDuration(this.url);
-
-  @override
-  List<Object?> get props => [url];
-}
+class GetDuration extends AudioPlayerEvent {}
 
 class GetCurrentPosition extends AudioPlayerEvent {}
 
