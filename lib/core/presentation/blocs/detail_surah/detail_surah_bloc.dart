@@ -14,6 +14,7 @@ class DetailSurahBloc extends Bloc<DetailSurahEvent, DetailSurahState> {
       : _surahRepositories = surahRepoositories,
         super(DetailSurahInitial()) {
     on<GetDetailSurah>(_getDetailSurahHandler);
+    on<ChangeDetailSurah>(_changeDetailSurah);
   }
 
   Future _getDetailSurahHandler(
@@ -28,5 +29,12 @@ class DetailSurahBloc extends Bloc<DetailSurahEvent, DetailSurahState> {
     } on DioException catch (e) {
       emit(DetailSurahError(e.message ?? 'Error getting detail surah'));
     }
+  }
+
+  Future _changeDetailSurah(
+    ChangeDetailSurah event,
+    Emitter<DetailSurahState> emit,
+  ) async {
+    add(GetDetailSurah(event.newSurahNumber));
   }
 }

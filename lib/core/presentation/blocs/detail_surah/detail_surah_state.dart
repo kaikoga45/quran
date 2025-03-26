@@ -13,7 +13,11 @@ final class DetailSurahLoading extends DetailSurahState {}
 
 final class DetailSurahLoaded extends DetailSurahState {
   final DetailSurahEntities detailSurah;
-  const DetailSurahLoaded(this.detailSurah);
+
+  const DetailSurahLoaded(
+    this.detailSurah,
+  );
+
   @override
   List<Object> get props => [detailSurah];
 }

@@ -13,3 +13,10 @@ final class GetDetailSurah extends DetailSurahEvent {
   @override
   List<Object> get props => [surahNumber];
 }
+
+final class ChangeDetailSurah extends DetailSurahEvent {
+  final int newSurahNumber;
+  const ChangeDetailSurah(this.newSurahNumber);
+  @override
+  List<Object> get props => [newSurahNumber];
+}

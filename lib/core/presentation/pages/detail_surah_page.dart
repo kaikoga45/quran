@@ -26,13 +26,26 @@ class DetailSurahPage extends StatelessWidget {
           ..add(GetDetailSurah(surahNumber));
       },
       child: BlocBuilder<DetailSurahBloc, DetailSurahState>(
-        builder: (context, state) {
-          return switch (state) {
-            DetailSurahLoading _ => const LoadingWidget(),
-            DetailSurahLoaded detailSurahLoaded =>
-              LoadedDetailSurahPage(detailSurahLoaded.detailSurah),
-            _ => const SizedBox(),
-          };
+        builder: (context, state) => switch (state) {
+          DetailSurahLoading _ => const LoadingWidget(),
+          DetailSurahLoaded detailSurahLoaded => LoadedDetailSurahPage(
+              detailSurahLoaded.detailSurah,
+              backwardCallback: () {
+                final int newSurahNumber = detailSurahLoaded
+                    .detailSurah.previousSurah.previousSurah!.number;
+                context
+                    .read<DetailSurahBloc>()
+                    .add(ChangeDetailSurah(newSurahNumber));
+              },
+              forwardCallback: () {
+                final int newSurahNumber =
+                    detailSurahLoaded.detailSurah.nextSurah.nextSurah!.number;
+                context
+                    .read<DetailSurahBloc>()
+                    .add(ChangeDetailSurah(newSurahNumber));
+              },
+            ),
+          _ => const SizedBox(),
         },
       ),
     );
@@ -41,9 +54,13 @@ class DetailSurahPage extends StatelessWidget {
 
 class LoadedDetailSurahPage extends StatefulWidget {
   final DetailSurahEntities detailSurah;
+  final VoidCallback backwardCallback;
+  final VoidCallback forwardCallback;
 
   const LoadedDetailSurahPage(
     this.detailSurah, {
+    required this.backwardCallback,
+    required this.forwardCallback,
     super.key,
   });
 
@@ -55,22 +72,22 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
     with SingleTickerProviderStateMixin {
   late ScrollController _scrollController;
   late AnimationController _animationController;
-  late GlobalKey _audioPlayerKey;
+  late GlobalKey _audioPlayerKeyWidget;
   Timer? _scrollEndTimer;
   bool isFingerReleased = false;
-  double heightAudioPlayer = 0.0;
+  double heightAudioPlayerWidget = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _audioPlayerKey = GlobalKey();
+    _audioPlayerKeyWidget = GlobalKey();
     _setHeightAudioPlayer();
     _scrollController = ScrollController();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _scrollController.addListener(_onScroll);
+    _scrollController.addListener(_onScrollListVerse);
   }
 
   @override
@@ -97,20 +114,18 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
         alignment: Alignment.bottomCenter,
         children: [
           Listener(
-            onPointerUp: (_) {
-              isFingerReleased = true;
-            },
+            onPointerUp: (_) => isFingerReleased = true,
             child: ListView.separated(
               controller: _scrollController,
               itemCount: widget.detailSurah.verses.length,
-              itemBuilder: (context, index) {
+              itemBuilder: (_, index) {
                 final verse = widget.detailSurah.verses[index];
                 return VerseCard(
                   index: index,
                   verse: verse,
                 );
               },
-              separatorBuilder: (context, index) {
+              separatorBuilder: (_, __) {
                 return const Divider(
                   color: ColorConstant.osloGrey,
                   thickness: 0.3,
@@ -120,15 +135,25 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
           ),
           AnimatedBuilder(
             animation: _animationController,
-            builder: (context, child) {
+            builder: (_, __) {
               return Transform.translate(
-                offset:
-                    Offset(0, _animationController.value * heightAudioPlayer),
+                offset: Offset(
+                  0,
+                  _animationController.value * heightAudioPlayerWidget,
+                ),
                 child: AudioPlayerWidget(
-                  key: _audioPlayerKey,
+                  key: _audioPlayerKeyWidget,
                   audioUrl: widget.detailSurah.audio,
                   title: widget.detailSurah.latinName,
                   subtitle: widget.detailSurah.revelationPlace,
+                  backwardOptions: (
+                    widget.detailSurah.previousSurah.status,
+                    () => widget.backwardCallback.call(),
+                  ),
+                  forwardOptions: (
+                    widget.detailSurah.nextSurah.status,
+                    () => widget.forwardCallback.call(),
+                  ),
                 ),
               );
             },
@@ -138,16 +163,16 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
     );
   }
 
-  void _onScroll() {
+  void _onScrollListVerse() {
     _scrollEndTimer?.cancel();
     if ([ScrollDirection.forward, ScrollDirection.reverse]
         .contains(_scrollController.position.userScrollDirection)) {
       _animationController.forward();
-      _setTimerResetAudioPlayerHeight();
+      _setTimerResetAudioPlayerWidgetHeight();
     }
   }
 
-  void _setTimerResetAudioPlayerHeight() {
+  void _setTimerResetAudioPlayerWidgetHeight() {
     _scrollEndTimer =
         Timer.periodic(const Duration(milliseconds: 500), (timer) {
       if (!isFingerReleased) return;
@@ -160,8 +185,8 @@ class _LoadedDetailSurahPageState extends State<LoadedDetailSurahPage>
   void _setHeightAudioPlayer() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final RenderBox renderBox =
-          _audioPlayerKey.currentContext?.findRenderObject() as RenderBox;
-      heightAudioPlayer = renderBox.size.height;
+          _audioPlayerKeyWidget.currentContext?.findRenderObject() as RenderBox;
+      heightAudioPlayerWidget = renderBox.size.height;
     });
   }
 }

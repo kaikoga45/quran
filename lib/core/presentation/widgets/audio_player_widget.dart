@@ -9,12 +9,16 @@ class AudioPlayerWidget extends StatefulWidget {
   final String audioUrl;
   final String title;
   final String subtitle;
+  final (bool hasBackwardEnable, VoidCallback backwardCallback) backwardOptions;
+  final (bool hasForwardEnable, VoidCallback forwardCallback) forwardOptions;
 
   const AudioPlayerWidget({
     super.key,
     required this.audioUrl,
     required this.title,
     required this.subtitle,
+    required this.backwardOptions,
+    required this.forwardOptions,
   });
 
   @override
@@ -84,8 +88,21 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
+                            IconButton(
+                              color: () {
+                                if (widget.backwardOptions.$1) {
+                                  return Colors.white;
+                                }
+                                return ColorConstant.liver;
+                              }(),
+                              icon: const Icon(
+                                CupertinoIcons.backward_fill,
+                                size: 40,
+                              ),
+                              onPressed: _onPressedBackwardButton,
+                            ),
                             IconButton(
                               color: Colors.white,
                               icon: Icon(
@@ -105,6 +122,19 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                                       .add(PlayAudio());
                                 }
                               },
+                            ),
+                            IconButton(
+                              color: () {
+                                if (widget.forwardOptions.$1) {
+                                  return Colors.white;
+                                }
+                                return ColorConstant.liver;
+                              }(),
+                              icon: const Icon(
+                                CupertinoIcons.forward_fill,
+                                size: 40,
+                              ),
+                              onPressed: _onPressedForwardButton,
                             ),
                           ],
                         ),
@@ -176,15 +206,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                                 size: 30,
                               ),
                               onPressed: () {
-                                if (isPlaying) {
-                                  context
-                                      .read<AudioPlayerBloc>()
-                                      .add(PauseAudio());
-                                } else {
-                                  context
-                                      .read<AudioPlayerBloc>()
-                                      .add(PlayAudio());
-                                }
+                                // TODO: Iimplement Repeat
                               },
                             ),
                           ],
@@ -206,6 +228,16 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
         },
       ),
     );
+  }
+
+  void _onPressedBackwardButton() {
+    if (!widget.backwardOptions.$1) return;
+    widget.backwardOptions.$2.call();
+  }
+
+  void _onPressedForwardButton() {
+    if (!widget.forwardOptions.$1) return;
+    widget.forwardOptions.$2.call();
   }
 
   void _createAudioPlayerBloc() {
