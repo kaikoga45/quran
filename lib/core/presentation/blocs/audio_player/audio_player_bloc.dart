@@ -8,7 +8,7 @@ part 'audio_player_event.dart';
 part 'audio_player_state.dart';
 
 class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
-  Timer? _positionTimer; // Timer to update playback position
+  Timer? _positionTimer;
 
   final AudioPlayerRepositories _repositories;
 
@@ -30,7 +30,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       try {
         await _repositories.play();
         emit(AudioPlaying());
-        // Start updating playback position
+
         _startPositionUpdates();
       } on PlatformException catch (e) {
         emit(AudioError(e.message ?? "Error playing audio"));
@@ -41,7 +41,7 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
       try {
         await _repositories.pause();
         emit(AudioPaused());
-        _positionTimer?.cancel(); // Stop updating position
+        _positionTimer?.cancel();
       } on PlatformException catch (e) {
         emit(AudioError(e.message ?? "Error pausing audio"));
       }
@@ -79,15 +79,15 @@ class AudioPlayerBloc extends Bloc<AudioPlayerEvent, AudioPlayerState> {
   }
 
   void _startPositionUpdates() {
-    _positionTimer?.cancel(); // Cancel any existing timer
+    _positionTimer?.cancel();
     _positionTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      add(GetCurrentPosition()); // Trigger event to get position
+      add(GetCurrentPosition());
     });
   }
 
   void _resetAudioPlayer() {
-    _positionTimer?.cancel(); // Clean up timer
-    _repositories.stop(); // Stop the audio
+    _positionTimer?.cancel();
+    _repositories.stop();
   }
 
   @override
